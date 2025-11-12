@@ -11,7 +11,7 @@ def conditional_numba(function):
     """
     try:
         from numba import jit
-        return jit(nopython=True)(function)
+        return jit(nopython=True,cache=True)(function)
     except ModuleNotFoundError:
         print("Warning: {function.__name__}: numba not installed. For speedup please install numpy: pip install numba")
         return function
