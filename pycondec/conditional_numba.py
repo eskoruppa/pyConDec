@@ -13,7 +13,7 @@ def conditional_numba(function):
         from numba import jit
         return jit(nopython=True,cache=True)(function)
     except ModuleNotFoundError:
-        print("Warning: {function.__name__}: numba not installed. For speedup please install numpy: pip install numba")
+        print(f"Warning: {function.__name__}: numba not installed. For speedup please install numpy: pip install numba")
         return function
     
 def conditional_jitclass(origclass):
@@ -25,5 +25,5 @@ def conditional_jitclass(origclass):
         from numba.experimental import jitclass
         return jitclass()(origclass)
     except ModuleNotFoundError:
-        print("Warning: {function.__name__}: numba not installed. For speedup please install numpy: pip install numba")
+        print(f"Warning: {function.__name__}: numba not installed. For speedup please install numpy: pip install numba")
         return origclass
