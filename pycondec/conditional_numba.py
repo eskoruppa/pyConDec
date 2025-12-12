@@ -1,29 +1,39 @@
 #!/bin/env python3
 
-"""
-    Methods that allow numba decorators that will revert back to native python if the numba module fails to load
-"""
-
-def conditional_numba(function):
-    """
-        The conditional decorator will use numba if the package is installed 
-        and otherwise revert to native python
-    """
-    try:
-        from numba import jit
-        return jit(nopython=True,cache=True)(function)
-    except ModuleNotFoundError:
-        print(f"Warning: {function.__name__}: numba not installed. For speedup please install numpy: pip install numba")
-        return function
+try:
+    from numba import jit
+except ImportError:
+    jit = None
     
-def conditional_jitclass(origclass):
+try:
+    from numba.experimental import jitclass
+except ImportError:
+    jitclass = None
+
+def conditional_numba(*jit_args, **jit_kwargs):
     """
-        The conditional decorator will use numba if the package is installed 
-        and otherwise revert to native python
+    A decorator factory that conditionally applies numba.jit with the
+    given arguments. If numba is not installed, it returns the original
+    function unchanged.
+    
+    Usage:
+        @conditional_numba(nopython=True, cache=True)
+        def f(...):
+            ...
+
+        @conditional_numba
+        def g(...):
+            ...
     """
-    try:
-        from numba.experimental import jitclass
-        return jitclass()(origclass)
-    except ModuleNotFoundError:
-        print(f"Warning: {function.__name__}: numba not installed. For speedup please install numpy: pip install numba")
-        return origclass
+    def decorator(func):
+        if jit is None:
+            return func
+        return jit(*jit_args, **jit_kwargs)(func)
+    return decorator
+    
+def conditional_jitclass(*jit_args, **jit_kwargs):
+    def wrapper(cls):
+        if jitclass is None:
+            return cls
+        return jitclass(*jit_args, **jit_kwargs)(cls)
+    return wrapper
