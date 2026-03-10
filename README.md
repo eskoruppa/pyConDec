@@ -25,7 +25,7 @@ pip install .
 To also install the optional Numba dependency:
 
 ```bash
-pip install ".[numba]"
+pip install numba
 ```
 
 ---
@@ -69,6 +69,40 @@ class Counter:
 ```
 
 Again, if Numba is absent the class is returned as a plain Python class.
+
+### `cond_dec` — conditional arbitrary decorator
+
+`cond_dec` is the general-purpose variant. It applies **any** decorator conditionally based on a boolean flag. Two calling styles are supported:
+
+**Style 1 — pre-configured decorator** (decorator already holds its own arguments):
+
+```python
+from functools import lru_cache
+from pycondec import cond_dec
+
+USE_CACHE = True
+
+@cond_dec(lru_cache(maxsize=128), USE_CACHE)
+def expensive(n):
+    return sum(range(n))
+```
+
+**Style 2 — decorator factory with arguments** (pass the factory and its arguments separately):
+
+```python
+from functools import lru_cache
+from pycondec import cond_dec
+
+USE_CACHE = True
+
+@cond_dec(lru_cache, USE_CACHE, maxsize=128)
+def expensive(n):
+    return sum(range(n))
+```
+
+Both styles are equivalent. The second style mirrors the `cond_jit` experience and is convenient when you want to keep the decorator factory and its arguments readable inline.
+
+When `condition` is `False` the original, undecorated function is returned — no branching needed at the call site and no hard dependency on the library providing the decorator.
 
 ---
 
