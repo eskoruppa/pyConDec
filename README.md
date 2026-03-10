@@ -1,2 +1,77 @@
-# pyConDev
-Module for conditional decorators
+# pyConDec
+
+**pyConDec** is a lightweight Python library that provides conditional decorators — decorators that apply an acceleration or transformation only when the required dependency is available, and fall back to a no-op otherwise.
+
+The primary use case is [Numba](https://numba.readthedocs.io/) JIT compilation: code decorated with `cond_jit` will be compiled with `numba.jit` when Numba is installed, and will run as plain Python when it is not. This lets you write performance-optimised code that remains portable and installable without making Numba a hard dependency.
+
+---
+
+## Installation
+
+### From PyPI (once published)
+
+```bash
+pip install pyConDec
+```
+
+### From source
+
+```bash
+git clone https://github.com/eskoruppa/pyConDec.git
+cd pyConDec
+pip install .
+```
+
+To also install the optional Numba dependency:
+
+```bash
+pip install ".[numba]"
+```
+
+---
+
+## Usage
+
+### `cond_jit` — conditional `numba.jit`
+
+`cond_jit` wraps `numba.jit`. When Numba is installed the function is JIT-compiled; when it is not, the original Python function is returned unchanged.
+
+```python
+from pycondec import cond_jit
+
+@cond_jit(nopython=True, cache=True)
+def dot_product(a, b):
+    result = 0.0
+    for i in range(len(a)):
+        result += a[i] * b[i]
+    return result
+
+print(dot_product([1.0, 2.0, 3.0], [4.0, 5.0, 6.0]))  # 32.0
+```
+
+If Numba is **not** installed, `dot_product` behaves as a regular Python function — no import errors, no code changes needed.
+
+### `cond_jitclass` — conditional `numba.experimental.jitclass`
+
+```python
+import numpy as np
+from pycondec import cond_jitclass
+
+spec = [('value', float)]
+
+@cond_jitclass(spec)
+class Counter:
+    def __init__(self, value):
+        self.value = value
+
+    def increment(self):
+        self.value += 1.0
+```
+
+Again, if Numba is absent the class is returned as a plain Python class.
+
+---
+
+## License
+
+GNU General Public License v2.0 — see [LICENSE](LICENSE) for details.
