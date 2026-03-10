@@ -9,7 +9,7 @@ description = "Module for conditional decorators in Python"
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [
-    { name = "Enrico Skoruppa", email = "enrico.skoruppa@gmail.com" }
+    { name = "Enrico Skoruppa", email = "esk.phys@gmail.com" }
 ]
 requires-python = ">=3.7"
 classifiers = [
